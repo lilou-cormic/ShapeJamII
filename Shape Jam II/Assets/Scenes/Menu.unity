@@ -1121,7 +1121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 1530182968}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &806925323
@@ -1898,7 +1898,7 @@ PrefabInstance:
     - target: {fileID: 4184024935727083683, guid: ffb838e4bc2c69544b81a15603ad1398,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: LevelSelect
+      value: Main
       objectReference: {fileID: 0}
     - target: {fileID: 4184024935727083693, guid: ffb838e4bc2c69544b81a15603ad1398,
         type: 3}
@@ -1910,6 +1910,12 @@ PrefabInstance:
 --- !u!224 &1530182967 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4184024935727083682, guid: ffb838e4bc2c69544b81a15603ad1398,
+    type: 3}
+  m_PrefabInstance: {fileID: 1530182966}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1530182968 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4184024935727083693, guid: ffb838e4bc2c69544b81a15603ad1398,
     type: 3}
   m_PrefabInstance: {fileID: 1530182966}
   m_PrefabAsset: {fileID: 0}

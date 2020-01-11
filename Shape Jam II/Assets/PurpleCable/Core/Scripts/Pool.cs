@@ -13,7 +13,7 @@ namespace PurpleCable
         [SerializeField]
         private int BatchCount = 10;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             _list = new List<TPoolable>(BatchCount);
         }
@@ -28,7 +28,10 @@ namespace PurpleCable
             {
                 for (int i = 0; i < BatchCount; i++)
                 {
-                    _list.Add(CreateItem());
+                    var newItem = CreateItem();
+                    newItem.SetAsAvailable();
+
+                    _list.Add(newItem);
                 }
 
                 item = _list.FirstOrDefault(x => !x.IsInUse);
