@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Connector : MonoBehaviour, IPoolable
 {
+    [SerializeField] SpriteLoader SpriteLoader = null;
+
     public ConnectorDef ConnectorDef { get; private set; }
 
     public int Col => Mathf.RoundToInt(transform.position.x);
@@ -19,6 +21,8 @@ public class Connector : MonoBehaviour, IPoolable
     public void Set(ConnectorDef connectorDef)
     {
         ConnectorDef = connectorDef;
+
+        SpriteLoader.RelativeFilePath = SpriteLoader.RelativeFilePath = ConnectorDef.RelativeFilePath;
     }
 
     #region IPoolable

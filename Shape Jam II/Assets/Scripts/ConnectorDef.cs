@@ -8,7 +8,11 @@ public class ConnectorDef : ScriptableObject, IEqualityComparer<ConnectorDef>
 
     public string DisplayName;
 
-    public string ImageName;
+    public string RelativeFilePath = @"Resources/Connector128x128.png";
+
+    public string RelativeSoundPath = @"Resources/ConnectorSound.wav";
+
+    public bool IsBad = false;
 
     public override string ToString()
     {

@@ -1,6 +1,7 @@
 ﻿using PurpleCable;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,15 +10,9 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [SerializeField] Transform LeftSpawnPoint = null;
-
-    [SerializeField] Transform MiddleSpawnPoint = null;
-
-    [SerializeField] Transform RightSpawnPoint = null;
+    [SerializeField] Transform[] SpawnPoints = null;
 
     private float Speed { get; set; } = 1f;
-
-    private Transform[] SpawnPoints { get; set; }
 
     private List<Connector> ConnectorList { get; set; }
 
@@ -29,6 +24,8 @@ public class GameManager : MonoBehaviour
 
     private Player player;
 
+    private Transform middleSpawnPoint;
+
     private HashSet<int> prevConnectors;
 
     private Connector currentConnector;
@@ -39,10 +36,10 @@ public class GameManager : MonoBehaviour
     {
         Instance = this;
 
+        middleSpawnPoint = SpawnPoints[SpawnPoints.Length / 2];
+
         ConnectorList = new List<Connector>();
         ConnectionList = new List<Connection>();
-
-        SpawnPoints = new Transform[] { LeftSpawnPoint, MiddleSpawnPoint, RightSpawnPoint };
 
         prevConnectors = new HashSet<int>();
 
@@ -61,7 +58,9 @@ public class GameManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         player.OnPlayerTryMove += Player_OnPlayerTryMove;
 
-        prevConnectors.Add(1);
+        player.transform.position = middleSpawnPoint.position;
+
+        prevConnectors.Add(SpawnPoints.Length / 2);
 
         currentConnector = null;
 
@@ -75,7 +74,7 @@ public class GameManager : MonoBehaviour
 
         if (_isInitiating)
         {
-            if (LeftSpawnPoint.position.y < 12)
+            if (middleSpawnPoint.position.y < 12)
             {
                 if (_timeLeft <= 0)
                 {
@@ -136,6 +135,23 @@ public class GameManager : MonoBehaviour
     {
         player.transform.position = connector.transform.position;
 
+        string soundFullPath = Application.dataPath + "/" + connector.ConnectorDef.RelativeSoundPath;
+
+        if (File.Exists(soundFullPath))
+        {
+            WWW audioLoader = new WWW("file://" + soundFullPath);
+            while (!audioLoader.isDone)
+            { }
+
+            audioLoader.GetAudioClip().Play(Random.Range(0, 10));
+        }
+
+        if (connector.ConnectorDef.IsBad)
+        {
+            GameOver();
+            return;
+        }
+
         if (!currentConnector.Connectors.Contains(connector))
         {
             ScoreManager.AddPoints(1);
@@ -151,35 +167,56 @@ public class GameManager : MonoBehaviour
 
     private void Spawn()
     {
-        List<int> sss = new List<int>(3);
+        HashSet<int> sss = new HashSet<int>();
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < SpawnPoints.Length; i++)
         {
-            if (Random.Range(0, 3) == i)
+            if (Random.Range(0, 2) == 1)
                 sss.Add(i);
         }
 
         if (!sss.Intersect(prevConnectors).Any())
             sss.Add(prevConnectors.Where(x => x >= 0).ToArray().GetRandom());
 
-        if (sss.Contains(0) && sss.Contains(2))
-            sss.Add(1);
+        for (int i = 0; i < SpawnPoints.Length - 2; i++)
+        {
+            if (!sss.Contains(i) || !sss.Any(x => x >= i + 2))
+                continue;
+
+            int k = sss.Where(x => x >= i + 2).Min();
+
+            for (int j = i + 1; j <= k; j++)
+            {
+                sss.Add(j);
+            }
+        }
 
         prevConnectors.Clear();
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < SpawnPoints.Length; i++)
         {
             bool spawnHere = sss.Contains(i);
 
             if (spawnHere)
             {
-                var connector = ConnectorPool.GetConnector(Connectors.GetRandomConnector());
+                var connector = ConnectorPool.GetConnector(Connectors.GetRandomGoodConnector());
                 connector.transform.position = SpawnPoints[i].position;
                 ConnectorList.Add(connector);
 
-                connector.name = connector.transform.position.ToString();
+                connector.name = connector.ConnectorDef.Name;
 
                 prevConnectors.Add(i);
+            }
+            else
+            {
+                if (Random.Range(0f, 1f) > 0.7f)
+                {
+                    var connector = ConnectorPool.GetConnector(Connectors.GetRandomBadConnector());
+                    connector.transform.position = SpawnPoints[i].position;
+                    ConnectorList.Add(connector);
+
+                    connector.name = connector.ConnectorDef.Name;
+                }
             }
         }
     }
@@ -189,8 +226,6 @@ public class GameManager : MonoBehaviour
         foreach (var connector in ConnectorList)
         {
             connector.transform.position += Vector3.down * 3;
-
-            connector.name = connector.transform.position.ToString();
 
             if (connector.transform.position.y < -5)
                 connector.SetAsAvailable();

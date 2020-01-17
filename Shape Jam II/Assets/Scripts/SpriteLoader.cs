@@ -64,6 +64,7 @@ public class SpriteLoader : MonoBehaviour
 
     [SerializeField, Tooltip("Path to asset relative to build's PROJECT_Data/ folder")]
     private string m_relativeFilePath = "";
+    public string RelativeFilePath { get => m_relativeFilePath; set { m_relativeFilePath = value; OnEnable(); } }
 
     [SerializeField,
         Tooltip("Whether to throw an error if we can't find the file\n"
@@ -92,7 +93,7 @@ public class SpriteLoader : MonoBehaviour
     }
 
     // apply the texture from file to the Sprite Renderer or Image
-    private void Start()
+    private void OnEnable()
     {
         if (m_spriteRenderer == null && m_image == null)
             return;
@@ -141,6 +142,7 @@ public class SpriteLoader : MonoBehaviour
         get
         {
             var appDataPath = Application.dataPath;
+
             return $"{appDataPath}/{m_relativeFilePath}";
         }
     }

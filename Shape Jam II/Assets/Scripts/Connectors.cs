@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class Connectors
@@ -11,12 +12,17 @@ public static class Connectors
     {
         _connectors = Resources.LoadAll<ConnectorDef>("Connectors");
 
-        if (_connectors == null)
-            _connectors = new ConnectorDef[] { new ConnectorDef() { Name = "Connector", DisplayName = "Connector" } };
+        //if (_connectors == null)
+        //    _connectors = new ConnectorDef[] { new ConnectorDef() { Name = "Connector", DisplayName = "Connector" } };
     }
 
-    public static ConnectorDef GetRandomConnector()
+    public static ConnectorDef GetRandomGoodConnector()
     {
-        return _connectors.GetRandom();
+        return _connectors.Where(x => !x.IsBad).ToArray().GetRandom();
+    }
+
+    public static ConnectorDef GetRandomBadConnector()
+    {
+        return _connectors.Where(x => x.IsBad).ToArray().GetRandom();
     }
 }

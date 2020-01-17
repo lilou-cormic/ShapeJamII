@@ -34,7 +34,7 @@ namespace PurpleCable
 
         #region Unity callbacks
 
-        private void Start()
+        private void Awake()
         {
             if (_instance != null)
             {
@@ -45,8 +45,8 @@ namespace PurpleCable
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            gameObject.SetActive(false);
             Cursor.visible = true;
+            gameObject.SetActive(false);
         }
 
         private void Update()
